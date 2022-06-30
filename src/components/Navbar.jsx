@@ -193,7 +193,7 @@ export const Navbar = () => {
         </Dialog>
       </Transition.Root>
 
-      <header className='relative bg-white'>
+      <header className='relative bg-white z-30'>
         <p className='bg-indigo-600 h-10 flex items-center justify-center text-sm font-medium text-white px-4 sm:px-6 lg:px-8'>
           Get free delivery on orders over $100
         </p>
@@ -217,11 +217,12 @@ export const Navbar = () => {
               <div className='ml-4 flex lg:ml-0'>
                 <a href='#'>
                   <span className='sr-only'>Workflow</span>
-                  <img
+                  <h3 className='font-semibold tracking-wide'>THRIFT PLACE</h3>
+                  {/* <img
                     className='h-8 w-auto'
                     src='https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=600'
                     alt=''
-                  />
+                  /> */}
                 </a>
               </div>
 
@@ -366,7 +367,7 @@ export const Navbar = () => {
                   </a>
                 </div>
 
-                <div className='hidden lg:ml-8 lg:flex'>
+                {/* <div className='hidden lg:ml-8 lg:flex'>
                   <a
                     href='#'
                     className='text-gray-700 hover:text-gray-800 flex items-center'
@@ -379,7 +380,7 @@ export const Navbar = () => {
                     <span className='ml-3 block text-sm font-medium'>CAD</span>
                     <span className='sr-only'>, change currency</span>
                   </a>
-                </div>
+                </div> */}
 
                 {/* Search */}
                 <div className='flex lg:ml-6'>
