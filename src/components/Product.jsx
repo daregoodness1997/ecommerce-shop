@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
+import { DataContext } from '../Context';
 
-export const Product = ({ product }) => {
+export const Product = ({ product, handleAddToCart }) => {
+  const value = useContext(DataContext);
+  const addCart = value.addCart;
+  const [cart] = value.cart;
+
+  console.log('Cart', cart);
+
   return (
     <div className='group relative'>
       <div className='w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>
@@ -20,7 +27,10 @@ export const Product = ({ product }) => {
             </a>
           </h3>
           {/* <p className='mt-1 text-sm text-gray-500'>{product.color}</p> */}
-          <button className='bg-gray-100 p-2 rounded w-10 mt-1 mb-1'>
+          <button
+            className='bg-gray-100 p-2 rounded w-10 mt-1 mb-1'
+            onClick={() => addCart(product.id, 1)}
+          >
             <ShoppingBagIcon
               className='flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500'
               aria-hidden='true'

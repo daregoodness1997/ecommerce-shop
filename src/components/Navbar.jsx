@@ -1,13 +1,14 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useContext } from 'react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
-
-import { navigation } from '../data';
+import { DataContext } from '../Context';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export const Navbar = ({ totalItems = 0, setOpen }) => {
+export const Navbar = ({ setOpen }) => {
+  const value = useContext(DataContext);
+  const [cart] = value.cart;
   return (
     <div className='bg-white'>
       <header className='relative bg-white z-30'>
@@ -43,7 +44,7 @@ export const Navbar = ({ totalItems = 0, setOpen }) => {
                       aria-hidden='true'
                     />
                     <span className='ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800'>
-                      {totalItems}
+                      {cart.total_items}
                     </span>
                     <span className='sr-only'>items in cart, view bag</span>
                   </a>
