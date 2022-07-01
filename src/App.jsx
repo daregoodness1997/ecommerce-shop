@@ -7,6 +7,7 @@ import { commerce } from './utils/commerce';
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const fetchProducts = async () => {
     const { data } = await commerce.products.list();
@@ -26,9 +27,9 @@ function App() {
 
   return (
     <div className='App'>
-      <Navbar />
+      <Navbar setOpen={() => setOpen(!open)} />
       <Products />
-      <Carts />
+      <Carts setOpen={() => setOpen(!open)} open={open} />
     </div>
   );
 }

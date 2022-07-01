@@ -3,9 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XIcon } from '@heroicons/react/outline';
 import { products } from '../data';
 
-export const Carts = () => {
-  const [open, setOpen] = useState(true);
-
+export const Carts = ({ open, setOpen }) => {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-40' onClose={setOpen}>
@@ -45,7 +43,7 @@ export const Carts = () => {
                           <button
                             type='button'
                             className='-m-2 p-2 text-gray-400 hover:text-gray-500'
-                            onClick={() => setOpen(false)}
+                            onClick={setOpen}
                           >
                             <span className='sr-only'>Close panel</span>
                             <XIcon className='h-6 w-6' aria-hidden='true' />
