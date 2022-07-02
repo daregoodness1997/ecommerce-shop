@@ -11,6 +11,7 @@ import {
   Products,
 } from './components';
 import { DataProvider } from './Context';
+import Page404 from './components/Page404';
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -26,6 +27,7 @@ function App() {
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/products/:id' element={<ProductDetails />} />
           <Route path='/order-summary/:id' element={<OrderSummary />} />
+          <Route path='*' element={<Page404 />} />
         </Routes>
       </div>
     </DataProvider>

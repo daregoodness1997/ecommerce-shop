@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StarIcon } from '@heroicons/react/solid';
 import { RadioGroup } from '@headlessui/react';
+import ProgressiveImage from './ProgressiveImage';
 
 const product = {
   name: 'Basic Tee 6-Pack',
@@ -110,7 +111,7 @@ export const ProductDetails = () => {
         {/* Image gallery */}
         <div className='mt-6 max-w-2xl mx-auto sm:px-6 lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-3 lg:gap-x-8'>
           <div className='hidden aspect-w-3 aspect-h-4 rounded-lg overflow-hidden lg:block'>
-            <img
+            <ProgressiveImage
               src={product.images[0].src}
               alt={product.images[0].alt}
               className='w-full h-full object-center object-cover'
@@ -118,14 +119,14 @@ export const ProductDetails = () => {
           </div>
           <div className='hidden lg:grid lg:grid-cols-1 lg:gap-y-8'>
             <div className='aspect-w-3 aspect-h-2 rounded-lg overflow-hidden'>
-              <img
+              <ProgressiveImage
                 src={product.images[1].src}
                 alt={product.images[1].alt}
                 className='w-full h-full object-center object-cover'
               />
             </div>
             <div className='aspect-w-3 aspect-h-2 rounded-lg overflow-hidden'>
-              <img
+              <ProgressiveImage
                 src={product.images[2].src}
                 alt={product.images[2].alt}
                 className='w-full h-full object-center object-cover'
@@ -133,7 +134,7 @@ export const ProductDetails = () => {
             </div>
           </div>
           <div className='aspect-w-4 aspect-h-5 sm:rounded-lg sm:overflow-hidden lg:aspect-w-3 lg:aspect-h-4'>
-            <img
+            <ProgressiveImage
               src={product.images[3].src}
               alt={product.images[3].alt}
               className='w-full h-full object-center object-cover'
