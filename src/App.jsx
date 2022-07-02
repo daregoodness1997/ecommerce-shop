@@ -6,6 +6,7 @@ import {
   Carts,
   Checkout,
   Navbar,
+  OrderSummary,
   ProductDetails,
   Products,
 } from './components';
@@ -24,6 +25,7 @@ function App() {
           <Route path='/' element={<Products />} />
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/products/:id' element={<ProductDetails />} />
+          <Route path='/order-summary/:id' element={<OrderSummary />} />
         </Routes>
       </div>
     </DataProvider>
