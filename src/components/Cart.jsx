@@ -5,6 +5,14 @@ const Cart = ({ item }) => {
   const value = useContext(DataContext);
   const [cart] = value.cart;
   const removeFromCart = value.removeFromCart;
+  const updateCartQty = value.updateCartQty;
+
+  const reduceItemQty = () => {
+    removeFromCart(item.id, item.quantity - 1);
+  };
+  const increaseItemQty = () => {
+    updateCartQty(item.id, item.quantity + 1);
+  };
 
   console.log('my cart', cart.line_items);
   return (
@@ -26,8 +34,22 @@ const Cart = ({ item }) => {
             <p className='ml-4'>{item.price.formatted_with_symbol}</p>
           </div>
         </div>
-        <div className='flex flex-1 items-end justify-between text-sm'>
-          <p className='text-gray-500'>Qty {item.quantity}</p>
+        <div className='flex flex-1 items-center justify-between text-sm'>
+          <div className='flex flex-1 items-center'>
+            <button
+              className='bg-gray-100 p-1.5 px-3  rounded-md mr-2 text-center'
+              onClick={reduceItemQty}
+            >
+              -
+            </button>
+            <p className='text-gray-500'>Qty {item.quantity}</p>
+            <button
+              className='bg-gray-100 p-1.5 px-3 rounded-md ml-2 text-center'
+              onClick={increaseItemQty}
+            >
+              +
+            </button>
+          </div>
 
           <div className='flex'>
             <button
