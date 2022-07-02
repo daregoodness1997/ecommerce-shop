@@ -57,7 +57,6 @@ export const DataProvider = ({ children }) => {
     fetchCart();
   }, []);
 
-  console.log(products);
 
   const value = {
     products: [products, setProducts],

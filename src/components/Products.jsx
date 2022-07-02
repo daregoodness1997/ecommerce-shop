@@ -2,13 +2,13 @@ import React, { useContext } from 'react';
 // import { products } from '../data';
 import { Product } from './Product';
 import { DataContext } from '../Context';
+import Loader from './Loader';
 
 export const Products = () => {
   const value = useContext(DataContext);
   const [products] = value.products;
 
-  console.log(products);
-  if (!products.length) return <p>Loading...</p>;
+  if (!products.length) return <Loader />;
 
   return (
     <div className='bg-white'>
