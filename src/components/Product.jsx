@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { DataContext } from '../Context';
 import ProgressiveImage from './ProgressiveImage';
 
