@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { DataContext } from '../Context';
+import ProgressiveImage from './ProgressiveImage';
 
 export const Product = ({ product, handleAddToCart }) => {
   const value = useContext(DataContext);
@@ -22,10 +23,10 @@ export const Product = ({ product, handleAddToCart }) => {
     <div>
       <div className='group relative'>
         <div className='w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>
-          <img
+          <ProgressiveImage
             src={product.assets[0].url}
             alt={product.name}
-            className='w-full h-full object-center object-cover lg:w-full lg:h-full'
+            placeholderSrc={product.name}
           />
         </div>
         <div className='mt-4 flex justify-between'>

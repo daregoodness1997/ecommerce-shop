@@ -1,6 +1,7 @@
 import { Fragment, useState, useContext } from 'react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { DataContext } from '../Context';
+import { Link } from 'react-router-dom';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -24,7 +25,7 @@ export const Navbar = ({ setOpen }) => {
             <div className='h-16 flex items-center'>
               {/* Logo */}
               <div className='ml-4 flex lg:ml-0'>
-                <a href='#'>
+                <Link to='/'>
                   <span className='sr-only'>Elegant Thrift Store</span>
                   <h3 className='font-semibold tracking-wide'>THRIFT PLACE</h3>
                   {/* <img
@@ -32,7 +33,7 @@ export const Navbar = ({ setOpen }) => {
                     src='https://tailwindui.com/img/logos/workflow-mark.svg?color=indigo&shade=600'
                     alt=''
                   /> */}
-                </a>
+                </Link>
               </div>
 
               <div className='ml-auto flex items-center'>

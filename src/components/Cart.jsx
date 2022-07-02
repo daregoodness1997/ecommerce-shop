@@ -8,13 +8,13 @@ const Cart = ({ item }) => {
   const updateCartQty = value.updateCartQty;
 
   const reduceItemQty = () => {
-    removeFromCart(item.id, item.quantity - 1);
+    updateCartQty(item.id, item.quantity - 1);
   };
   const increaseItemQty = () => {
     updateCartQty(item.id, item.quantity + 1);
   };
 
-  console.log('my cart', cart.line_items);
+  // console.log('my cart', cart.line_items);
   return (
     <li className='flex py-6'>
       <div className='h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200'>
