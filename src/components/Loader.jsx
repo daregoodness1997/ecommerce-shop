@@ -10,3 +10,5 @@ const Loader = () => {
 };
 
 export default Loader;
+
+// https://mhnpd.github.io/react-loader-spinner-example/

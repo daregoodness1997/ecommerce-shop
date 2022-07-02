@@ -11,7 +11,6 @@ import {
   Products,
 } from './components';
 import { DataProvider } from './Context';
-import { Alert } from './components/Alert';
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -22,7 +21,6 @@ function App() {
       <div className='App'>
         <Navbar setOpen={() => setOpen(!open)} />
         <Carts setOpen={() => setOpen(!open)} open={open} />
-        <Alert />
         <Routes>
           <Route path='/' element={<Products />} />
           <Route path='/checkout' element={<Checkout />} />
