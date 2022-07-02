@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../Context';
 import { Alert } from './Alert';
 import ProgressiveImage from './ProgressiveImage';
@@ -18,10 +18,13 @@ export const Product = ({ product, handleAddToCart }) => {
   // console.log('Cart', cart);
 
   const addToCart = () => {
+    setLoading(true);
     addCart(product.id, 1);
-    console.log(loading);
-    // setOpen(true);
-    toast.success(`${product.name} added to cart`);
+
+    setTimeout(() => {
+      setLoading(false);
+      toast.success(`${product.name} added to cart`);
+    }, 1500);
   };
 
   return (
@@ -54,7 +57,7 @@ export const Product = ({ product, handleAddToCart }) => {
 
       <div onClick={addToCart}>
         <button
-          className='bg-gray-100 p-2 rounded-md w-full mt-1 mb-1 text-center'
+          className='flex bg-gray-100 px-6 py-2 items-center justify-center rounded-md w-full mt-1 mb-1 text-center'
           onClick={() => console.log('added to cart')}
         >
           {loading ? (
