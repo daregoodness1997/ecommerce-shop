@@ -5,6 +5,7 @@ import ProgressiveImage from './ProgressiveImage';
 import { toast } from 'react-toastify';
 import Toast from './Toast';
 import { Oval } from 'react-loader-spinner';
+import { Link } from 'react-router-dom';
 
 export const Product = ({ product, handleAddToCart }) => {
   const value = useContext(DataContext);
@@ -33,19 +34,21 @@ export const Product = ({ product, handleAddToCart }) => {
 
       <div className='group relative'>
         <div className='w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>
-          <ProgressiveImage
-            src={product.assets[0].url || null}
-            alt={product.name}
-            placeholderSrc={product.name}
-          />
+          <Link to={`/products/${product.id}`}>
+            <ProgressiveImage
+              src={product.assets[0].url || null}
+              alt={product.name}
+              placeholderSrc={product.name}
+            />
+          </Link>
         </div>
         <div className='mt-4 flex justify-between'>
           <div className='flex flex-col'>
             <h3 className='text-sm text-gray-700'>
-              <a href='#'>
+              <Link to={`/products/${product.id}`}>
                 <span aria-hidden='true' className='absolute inset-0' />
                 {product.name}
-              </a>
+              </Link>
             </h3>
             {/* <p className='mt-1 text-sm text-gray-500'>{product.color}</p> */}
           </div>
@@ -72,6 +75,16 @@ export const Product = ({ product, handleAddToCart }) => {
             </div>
           )}
         </button>
+      </div>
+      <div>
+        <a
+          href={`https://wa.me/2347019805776/?text=Hello can I get this product https://prismatic-medovik-afb31b.netlify.app/products/${product.id}`}
+          target='_blank'
+          className='flex  bg-green-400 text-white px-6 py-2 items-center justify-center rounded-md w-full mt-2 mb-1 text-center'
+          onClick={() => console.log('added to cart')}
+        >
+          Continue on Whatsapp
+        </a>
       </div>
     </div>
   );
