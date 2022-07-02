@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { DataContext } from '../Context';
 
 const Cart = ({ item }) => {
@@ -6,12 +6,15 @@ const Cart = ({ item }) => {
   const [cart] = value.cart;
   const removeFromCart = value.removeFromCart;
   const updateCartQty = value.updateCartQty;
+  const [qtyCount, setQtyCount] = useState(item.quantity || 1);
 
   const reduceItemQty = () => {
     updateCartQty(item.id, item.quantity - 1);
+    setQtyCount(qtyCount - 1);
   };
   const increaseItemQty = () => {
     updateCartQty(item.id, item.quantity + 1);
+    setQtyCount(qtyCount + 1);
   };
 
   // console.log('my cart', cart.line_items);
@@ -42,7 +45,7 @@ const Cart = ({ item }) => {
             >
               -
             </button>
-            <p className='text-gray-500'>Qty {item.quantity}</p>
+            <p className='text-gray-500'>Qty {qtyCount}</p>
             <button
               className='bg-gray-100 p-1.5 px-3 rounded-md ml-2 text-center'
               onClick={increaseItemQty}
