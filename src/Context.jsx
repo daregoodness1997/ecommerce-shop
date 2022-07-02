@@ -15,6 +15,16 @@ export const DataProvider = ({ children }) => {
     setCart(await commerce.cart.retrieve());
   };
 
+  // const addCart = (productId, quantity) => {
+  //   commerce.cart
+  //     .add(productId, quantity)
+  //     .then(item => {
+  //       setCart(item.cart);
+  //     })
+  //     .catch(error => {
+  //       console.error('There was an error adding the item to the cart', error);
+  //     });
+  // };
   const addCart = async (productId, quantity) => {
     const item = await commerce.cart.add(productId, quantity);
 
@@ -33,6 +43,8 @@ export const DataProvider = ({ children }) => {
 
   const emptyCart = async () => {
     const response = await commerce.cart.empty();
+    setCart(response.cart);
+    // window.location.reload(false);
   };
 
   const refreshCart = async () => {
@@ -44,6 +56,8 @@ export const DataProvider = ({ children }) => {
     fetchProducts();
     fetchCart();
   }, []);
+
+  console.log(products);
 
   const value = {
     products: [products, setProducts],

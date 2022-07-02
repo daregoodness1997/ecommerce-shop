@@ -5,7 +5,7 @@ import { DataContext } from '../Context';
 
 export const Products = () => {
   const value = useContext(DataContext);
-  const [products] = value.products;g
+  const [products] = value.products;
 
   console.log(products);
   if (!products.length) return <p>Loading...</p>;

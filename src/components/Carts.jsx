@@ -9,8 +9,36 @@ import Cart from './Cart';
 export const Carts = ({ open, setOpen }) => {
   const value = useContext(DataContext);
   const [cart] = value.cart;
+  const emptyCart = value.emptyCart;
 
-  let cartLength = cart.line_items;
+  // const handleEmptyCart = () => {
+  //   onEmptyCart();
+  // };
+
+  const renderEmptyMessage = () => {
+    if (cart.total_unique_items > 0) {
+      return;
+    }
+
+    return (
+      <p className='cart__none'>
+        You have no items in your shopping cart, start adding some!
+      </p>
+    );
+  };
+
+  const renderItems = () => {
+    if (!cart.line_items) return '...loading';
+
+    return cart.line_items.map(lineItem => (
+      <Cart item={lineItem} key={lineItem.id} />
+    ));
+  };
+  const renderSubTotal = () => {
+    if (!cart.line_items) return null;
+
+    return <p>{cart.subtotal.formatted_with_symbol}</p>;
+  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -45,7 +73,15 @@ export const Carts = ({ open, setOpen }) => {
                       <div className='flex items-start justify-between'>
                         <Dialog.Title className='text-lg font-medium text-gray-900'>
                           Shopping cart
+                          <button
+                            onClick={emptyCart}
+                            className='text-red-500 pl-4'
+                          >
+                            {' '}
+                            Clear Cart
+                          </button>
                         </Dialog.Title>
+
                         <div className='ml-3 flex h-7 items-center'>
                           <button
                             type='button'
@@ -64,11 +100,8 @@ export const Carts = ({ open, setOpen }) => {
                             role='list'
                             className='-my-6 divide-y divide-gray-200'
                           >
-                            {cartLength === 0 ? (
-                              <p>No Item in Cart...</p>
-                            ) : (
-                              <Cart />
-                            )}
+                            {renderEmptyMessage()}
+                            {renderItems()}
                           </ul>
                         </div>
                       </div>
@@ -77,7 +110,7 @@ export const Carts = ({ open, setOpen }) => {
                     <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
                       <div className='flex justify-between text-base font-medium text-gray-900'>
                         <p>Subtotal</p>
-                        <p>$262.00</p>
+                        {renderSubTotal()}
                       </div>
                       <p className='mt-0.5 text-sm text-gray-500'>
                         Shipping and taxes calculated at checkout.
