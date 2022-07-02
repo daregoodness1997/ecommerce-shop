@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 /* This example requires Tailwind CSS v2.0+ */
 const products = [
   {
@@ -144,12 +146,12 @@ export const OrderSummary = () => {
               </dl>
 
               <div className='mt-16 border-t border-gray-200 py-6 text-right'>
-                <a
-                  href='#'
+                <Link
+                  to='/'
                   className='text-sm font-medium text-indigo-600 hover:text-indigo-500'
                 >
                   Continue Shopping<span aria-hidden='true'> &rarr;</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
