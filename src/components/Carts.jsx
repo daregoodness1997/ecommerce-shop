@@ -1,9 +1,45 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useContext } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XIcon } from '@heroicons/react/outline';
 import { products } from '../data';
+import { DataContext } from '../Context';
+
+import Cart from './Cart';
 
 export const Carts = ({ open, setOpen }) => {
+  const value = useContext(DataContext);
+  const [cart] = value.cart;
+  const emptyCart = value.emptyCart;
+
+  // const handleEmptyCart = () => {
+  //   onEmptyCart();
+  // };
+
+  const renderEmptyMessage = () => {
+    if (cart.total_unique_items > 0) {
+      return;
+    }
+
+    return (
+      <p className='cart__none'>
+        You have no items in your shopping cart, start adding some!
+      </p>
+    );
+  };
+
+  const renderItems = () => {
+    if (!cart.line_items) return '...loading';
+
+    return cart.line_items.map(lineItem => (
+      <Cart item={lineItem} key={lineItem.id} />
+    ));
+  };
+  const renderSubTotal = () => {
+    if (!cart.line_items) return null;
+
+    return <p>{cart.subtotal.formatted_with_symbol}</p>;
+  };
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-40' onClose={setOpen}>
@@ -36,9 +72,16 @@ export const Carts = ({ open, setOpen }) => {
                     <div className='flex-1 overflow-y-auto py-6 px-4 sm:px-6'>
                       <div className='flex items-start justify-between'>
                         <Dialog.Title className='text-lg font-medium text-gray-900'>
-                          {' '}
-                          Shopping cart{' '}
+                          Shopping cart
+                          <button
+                            onClick={emptyCart}
+                            className='text-red-500 pl-4'
+                          >
+                            {' '}
+                            Clear Cart
+                          </button>
                         </Dialog.Title>
+
                         <div className='ml-3 flex h-7 items-center'>
                           <button
                             type='button'
@@ -57,48 +100,8 @@ export const Carts = ({ open, setOpen }) => {
                             role='list'
                             className='-my-6 divide-y divide-gray-200'
                           >
-                            {products.map(product => (
-                              <li key={product.id} className='flex py-6'>
-                                <div className='h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200'>
-                                  <img
-                                    src={product.imageSrc}
-                                    alt={product.imageAlt}
-                                    className='h-full w-full object-cover object-center'
-                                  />
-                                </div>
-
-                                <div className='ml-4 flex flex-1 flex-col'>
-                                  <div>
-                                    <div className='flex justify-between text-base font-medium text-gray-900'>
-                                      <h3>
-                                        <a href={product.href}>
-                                          {' '}
-                                          {product.name}{' '}
-                                        </a>
-                                      </h3>
-                                      <p className='ml-4'>{product.price}</p>
-                                    </div>
-                                    <p className='mt-1 text-sm text-gray-500'>
-                                      {product.color}
-                                    </p>
-                                  </div>
-                                  <div className='flex flex-1 items-end justify-between text-sm'>
-                                    <p className='text-gray-500'>
-                                      Qty {product.quantity}
-                                    </p>
-
-                                    <div className='flex'>
-                                      <button
-                                        type='button'
-                                        className='font-medium text-indigo-600 hover:text-indigo-500'
-                                      >
-                                        Remove
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </li>
-                            ))}
+                            {renderEmptyMessage()}
+                            {renderItems()}
                           </ul>
                         </div>
                       </div>
@@ -107,7 +110,7 @@ export const Carts = ({ open, setOpen }) => {
                     <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
                       <div className='flex justify-between text-base font-medium text-gray-900'>
                         <p>Subtotal</p>
-                        <p>$262.00</p>
+                        {renderSubTotal()}
                       </div>
                       <p className='mt-0.5 text-sm text-gray-500'>
                         Shipping and taxes calculated at checkout.
@@ -118,6 +121,14 @@ export const Carts = ({ open, setOpen }) => {
                           className='flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700'
                         >
                           Checkout
+                        </a>
+                      </div>
+                      <div className='mt-2'>
+                        <a
+                          href='#'
+                          className='flex items-center justify-center rounded-md border border-transparent bg-green-500 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700'
+                        >
+                          Continue in Whatsapp
                         </a>
                       </div>
                       <div className='mt-6 flex justify-center text-center text-sm text-gray-500'>
