@@ -5,6 +5,7 @@ import ProgressiveImage from './ProgressiveImage';
 import { useParams } from 'react-router-dom';
 import { DataContext } from '../Context';
 import Loader from './Loader';
+import { stripHtml } from 'string-strip-html';
 
 const product = {
   name: 'Basic Tee 6-Pack',
@@ -132,37 +133,11 @@ export const ProductDetails = () => {
           {/* Options */}
           <div className='mt-4 lg:mt-0 lg:row-span-3'>
             <h2 className='sr-only'>Product information</h2>
-            <p className='text-3xl text-gray-900'>{product.price}</p>
+            <p className='text-3xl text-gray-900'>
+              {productD[0].price.formatted_with_symbol}
+            </p>
 
-            {/* Reviews */}
-            <div className='mt-6'>
-              <h3 className='sr-only'>Reviews</h3>
-              <div className='flex items-center'>
-                <div className='flex items-center'>
-                  {[0, 1, 2, 3, 4].map(rating => (
-                    <StarIcon
-                      key={rating}
-                      className={classNames(
-                        reviews.average > rating
-                          ? 'text-gray-900'
-                          : 'text-gray-200',
-                        'h-5 w-5 flex-shrink-0'
-                      )}
-                      aria-hidden='true'
-                    />
-                  ))}
-                </div>
-                <p className='sr-only'>{reviews.average} out of 5 stars</p>
-                <a
-                  href={reviews.href}
-                  className='ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500'
-                >
-                  {reviews.totalCount} reviews
-                </a>
-              </div>
-            </div>
-
-            <form className='mt-10'>
+            <di className='mt-10'>
               {/* Colors */}
               <div>
                 <h3 className='text-sm text-gray-900 font-medium'>Color</h3>
@@ -205,127 +180,28 @@ export const ProductDetails = () => {
                 </RadioGroup>
               </div>
 
-              {/* Sizes */}
-              <div className='mt-10'>
-                <div className='flex items-center justify-between'>
-                  <h3 className='text-sm text-gray-900 font-medium'>Size</h3>
-                  <a
-                    href='#'
-                    className='text-sm font-medium text-indigo-600 hover:text-indigo-500'
-                  >
-                    Size guide
-                  </a>
-                </div>
-
-                <RadioGroup
-                  value={selectedSize}
-                  onChange={setSelectedSize}
-                  className='mt-4'
-                >
-                  <RadioGroup.Label className='sr-only'>
-                    Choose a size
-                  </RadioGroup.Label>
-                  <div className='grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4'>
-                    {product.sizes.map(size => (
-                      <RadioGroup.Option
-                        key={size.name}
-                        value={size}
-                        disabled={!size.inStock}
-                        className={({ active }) =>
-                          classNames(
-                            size.inStock
-                              ? 'bg-white shadow-sm text-gray-900 cursor-pointer'
-                              : 'bg-gray-50 text-gray-200 cursor-not-allowed',
-                            active ? 'ring-2 ring-indigo-500' : '',
-                            'group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6'
-                          )
-                        }
-                      >
-                        {({ active, checked }) => (
-                          <>
-                            <RadioGroup.Label as='span'>
-                              {size.name}
-                            </RadioGroup.Label>
-                            {size.inStock ? (
-                              <span
-                                className={classNames(
-                                  active ? 'border' : 'border-2',
-                                  checked
-                                    ? 'border-indigo-500'
-                                    : 'border-transparent',
-                                  'absolute -inset-px rounded-md pointer-events-none'
-                                )}
-                                aria-hidden='true'
-                              />
-                            ) : (
-                              <span
-                                aria-hidden='true'
-                                className='absolute -inset-px rounded-md border-2 border-gray-200 pointer-events-none'
-                              >
-                                <svg
-                                  className='absolute inset-0 w-full h-full text-gray-200 stroke-2'
-                                  viewBox='0 0 100 100'
-                                  preserveAspectRatio='none'
-                                  stroke='currentColor'
-                                >
-                                  <line
-                                    x1={0}
-                                    y1={100}
-                                    x2={100}
-                                    y2={0}
-                                    vectorEffect='non-scaling-stroke'
-                                  />
-                                </svg>
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </RadioGroup.Option>
-                    ))}
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <button
-                type='submit'
-                className='mt-10 w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-              >
-                Add to bag
+              <button className='mt-10 w-full bg-amber-400 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-black hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500'>
+                Buy Now
               </button>
-            </form>
+              <button className='mt-2 w-full bg-black border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black-500'>
+                Add to Cart
+              </button>
+              <button className='mt-2 w-full bg-green-400 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'>
+                Continue on Whatsapp
+              </button>
+            </di>
           </div>
 
           <div className='py-10 lg:pt-6 lg:pb-16 lg:col-start-1 lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8'>
-            {/* Description and details */}
-            <div>
-              <h3 className='sr-only'>Description</h3>
-
-              <div className='space-y-6'>
-                <p className='text-base text-gray-900'>
-                  {productD[0].description}
-                </p>
-              </div>
-            </div>
-
             <div className='mt-10'>
-              <h3 className='text-sm font-medium text-gray-900'>Highlights</h3>
-
-              <div className='mt-4'>
-                <ul role='list' className='pl-4 list-disc text-sm space-y-2'>
-                  {product.highlights.map(highlight => (
-                    <li key={highlight} className='text-gray-400'>
-                      <span className='text-gray-600'>{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className='mt-10'>
-              <h2 className='text-sm font-medium text-gray-900'>Details</h2>
+              <h2 className='text-sm font-medium text-gray-900'>Description</h2>
 
               <div className='mt-4 space-y-6'>
-                <p className='text-sm text-gray-600'>{product.details}</p>
+                <p className='text-sm text-gray-600'>
+                  {productD[0].description.replace(/(<([^>]+)>)/gi, '')}
+
+                  {/* https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/ */}
+                </p>
               </div>
             </div>
           </div>

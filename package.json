@@ -13,11 +13,13 @@
     "@heroicons/react": "^1.0.6",
     "@stripe/react-stripe-js": "^1.9.0",
     "@stripe/stripe-js": "^1.32.0",
+    "assert": "^2.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-loader-spinner": "^5.1.5",
     "react-router-dom": "^6.3.0",
-    "react-toastify": "^9.0.5"
+    "react-toastify": "^9.0.5",
+    "string-strip-html": "^9.1.12"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
