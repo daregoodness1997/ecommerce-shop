@@ -1,25 +1,12 @@
-import { Fragment, useState, useContext } from 'react';
-import {
-  Dialog,
-  Popover,
-  RadioGroup,
-  Tab,
-  Transition,
-} from '@headlessui/react';
-import {
-  MenuIcon,
-  QuestionMarkCircleIcon,
-  SearchIcon,
-  ShoppingBagIcon,
-  XIcon,
-} from '@heroicons/react/outline';
+import { useState, useContext } from 'react';
+import { RadioGroup } from '@headlessui/react';
+
 import { CheckCircleIcon, TrashIcon } from '@heroicons/react/solid';
 import Input from './Input';
 import Select from './Select';
 import { DataContext } from '../Context';
 import { Link } from 'react-router-dom';
-
-const currencies = ['CAD', 'USD', 'AUD', 'EUR', 'GBP'];
+import Cart from './Cart';
 
 const products = [
   {
@@ -58,8 +45,21 @@ export const Checkout = () => {
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(
     deliveryMethods[0]
   );
+  const [checkoutValue, setCheckoutValue] = useState({});
+  const [countries, setCountries] = useState([]);
+
   const value = useContext(DataContext);
   const [cart] = value.cart;
+
+  console.log(checkoutValue);
+
+  const renderCart = () => {
+    if (!cart.line_items) return '...loading';
+
+    return cart.line_items.map(lineItem => (
+      <Cart item={lineItem} key={lineItem.id} />
+    ));
+  };
 
   return (
     <div className='bg-white'>
@@ -85,8 +85,36 @@ export const Checkout = () => {
                     <Input
                       type='email'
                       id='email-address'
-                      name='email-address'
+                      name='email'
                       autoComplete='email'
+                      onChange={e =>
+                        setCheckoutValue({
+                          ...checkoutValue,
+                          [e.target.name]: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className='sm:col-span-2 mt-4'>
+                  <label
+                    htmlFor='phone'
+                    className='block text-sm font-medium text-gray-700'
+                  >
+                    Phone
+                  </label>
+                  <div className='mt-1'>
+                    <Input
+                      type='text'
+                      name='phone'
+                      id='phone'
+                      autoComplete='tel'
+                      onChange={e =>
+                        setCheckoutValue({
+                          ...checkoutValue,
+                          [e.target.name]: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -109,8 +137,14 @@ export const Checkout = () => {
                       <Input
                         type='text'
                         id='first-name'
-                        name='first-name'
+                        name='firstName'
                         autoComplete='given-name'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -126,21 +160,15 @@ export const Checkout = () => {
                       <Input
                         type='text'
                         id='last-name'
-                        name='last-name'
+                        name='lastName'
                         autoComplete='family-name'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
                       />
-                    </div>
-                  </div>
-
-                  <div className='sm:col-span-2'>
-                    <label
-                      htmlFor='company'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Company
-                    </label>
-                    <div className='mt-1'>
-                      <Input type='text' name='company' id='company' />
                     </div>
                   </div>
 
@@ -157,6 +185,12 @@ export const Checkout = () => {
                         name='address'
                         id='address'
                         autoComplete='street-address'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -169,7 +203,17 @@ export const Checkout = () => {
                       Apartment, suite, etc.
                     </label>
                     <div className='mt-1'>
-                      <Input type='text' name='apartment' id='apartment' />
+                      <Input
+                        type='text'
+                        name='apartment'
+                        id='apartment'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                   </div>
 
@@ -186,6 +230,12 @@ export const Checkout = () => {
                         name='city'
                         id='city'
                         autoComplete='address-level2'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -220,6 +270,12 @@ export const Checkout = () => {
                         name='region'
                         id='region'
                         autoComplete='address-level1'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -237,23 +293,12 @@ export const Checkout = () => {
                         name='postal-code'
                         id='postal-code'
                         autoComplete='postal-code'
-                      />
-                    </div>
-                  </div>
-
-                  <div className='sm:col-span-2'>
-                    <label
-                      htmlFor='phone'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Phone
-                    </label>
-                    <div className='mt-1'>
-                      <Input
-                        type='text'
-                        name='phone'
-                        id='phone'
-                        autoComplete='tel'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -329,114 +374,6 @@ export const Checkout = () => {
                   </div>
                 </RadioGroup>
               </div>
-
-              {/* Payment */}
-              <div className='mt-10 border-t border-gray-200 pt-10'>
-                <h2 className='text-lg font-medium text-gray-900'>Payment</h2>
-
-                <fieldset className='mt-4'>
-                  <legend className='sr-only'>Payment type</legend>
-                  <div className='space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10'>
-                    {paymentMethods.map((paymentMethod, paymentMethodIdx) => (
-                      <div key={paymentMethod.id} className='flex items-center'>
-                        {paymentMethodIdx === 0 ? (
-                          <Input
-                            id={paymentMethod.id}
-                            name='payment-type'
-                            type='radio'
-                            defaultChecked
-                            className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                          />
-                        ) : (
-                          <Input
-                            id={paymentMethod.id}
-                            name='payment-type'
-                            type='radio'
-                            className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                          />
-                        )}
-
-                        <label
-                          htmlFor={paymentMethod.id}
-                          className='ml-3 block text-sm font-medium text-gray-700'
-                        >
-                          {paymentMethod.title}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-
-                <div className='mt-6 grid grid-cols-4 gap-y-6 gap-x-4'>
-                  <div className='col-span-4'>
-                    <label
-                      htmlFor='card-number'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Card number
-                    </label>
-                    <div className='mt-1'>
-                      <Input
-                        type='text'
-                        id='card-number'
-                        name='card-number'
-                        autoComplete='cc-number'
-                      />
-                    </div>
-                  </div>
-
-                  <div className='col-span-4'>
-                    <label
-                      htmlFor='name-on-card'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Name on card
-                    </label>
-                    <div className='mt-1'>
-                      <Input
-                        type='text'
-                        id='name-on-card'
-                        name='name-on-card'
-                        autoComplete='cc-name'
-                      />
-                    </div>
-                  </div>
-
-                  <div className='col-span-3'>
-                    <label
-                      htmlFor='expiration-date'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Expiration date (MM/YY)
-                    </label>
-                    <div className='mt-1'>
-                      <Input
-                        type='text'
-                        name='expiration-date'
-                        id='expiration-date'
-                        autoComplete='cc-exp'
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='cvc'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      CVC
-                    </label>
-                    <div className='mt-1'>
-                      <Input
-                        type='text'
-                        name='cvc'
-                        id='cvc'
-                        autoComplete='csc'
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Order summary */}
@@ -447,78 +384,8 @@ export const Checkout = () => {
 
               <div className='mt-4 bg-white border border-gray-200 rounded-lg shadow-sm'>
                 <h3 className='sr-only'>Items in your cart</h3>
-                <ul role='list' className='divide-y divide-gray-200'>
-                  {products.map(product => (
-                    <li key={product.id} className='flex py-6 px-4 sm:px-6'>
-                      <div className='flex-shrink-0'>
-                        <img
-                          src={product.imageSrc}
-                          alt={product.imageAlt}
-                          className='w-20 rounded-md'
-                        />
-                      </div>
-
-                      <div className='ml-6 flex-1 flex flex-col'>
-                        <div className='flex'>
-                          <div className='min-w-0 flex-1'>
-                            <h4 className='text-sm'>
-                              <a
-                                href={product.href}
-                                className='font-medium text-gray-700 hover:text-gray-800'
-                              >
-                                {product.title}
-                              </a>
-                            </h4>
-                            <p className='mt-1 text-sm text-gray-500'>
-                              {product.color}
-                            </p>
-                            <p className='mt-1 text-sm text-gray-500'>
-                              {product.size}
-                            </p>
-                          </div>
-
-                          <div className='ml-4 flex-shrink-0 flow-root'>
-                            <button
-                              type='button'
-                              className='-m-2.5 bg-white p-2.5 flex items-center justify-center text-gray-400 hover:text-gray-500'
-                            >
-                              <span className='sr-only'>Remove</span>
-                              <TrashIcon
-                                className='h-5 w-5'
-                                aria-hidden='true'
-                              />
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className='flex-1 pt-2 flex items-end justify-between'>
-                          <p className='mt-1 text-sm font-medium text-gray-900'>
-                            {product.price}
-                          </p>
-
-                          <div className='ml-4'>
-                            <label htmlFor='quantity' className='sr-only'>
-                              Quantity
-                            </label>
-                            <select
-                              id='quantity'
-                              name='quantity'
-                              className='rounded-md border border-gray-300 text-base font-medium text-gray-700 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                            >
-                              <option value={1}>1</option>
-                              <option value={2}>2</option>
-                              <option value={3}>3</option>
-                              <option value={4}>4</option>
-                              <option value={5}>5</option>
-                              <option value={6}>6</option>
-                              <option value={7}>7</option>
-                              <option value={8}>8</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
+                <ul role='list' className='divide-y divide-gray-200 px-4'>
+                  {renderCart()}
                 </ul>
                 <dl className='border-t border-gray-200 py-6 px-4 space-y-6 sm:px-6'>
                   <div className='flex items-center justify-between'>
@@ -544,13 +411,13 @@ export const Checkout = () => {
                 </dl>
 
                 <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
-                  <Link
+                  <button
                     to='/order-summary/1'
                     type='submit'
-                    className='w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
+                    className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
                   >
-                    Confirm order
-                  </Link>
+                    Pay with Stripe
+                  </button>
                 </div>
               </div>
             </div>
