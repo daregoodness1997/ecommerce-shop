@@ -3,21 +3,27 @@ import { RadioGroup } from '@headlessui/react';
 
 import { CheckCircleIcon, TrashIcon } from '@heroicons/react/solid';
 import Input from './Input';
-import Select from './Select';
 import { DataContext } from '../Context';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Cart from './Cart';
 import { Audio } from 'react-loader-spinner';
 import api from '../utils/api';
+import { commerce } from '../utils/commerce';
+import {
+  Elements,
+  CardElement,
+  ElementsConsumer,
+} from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 const deliveryMethods = [
   {
     id: 1,
     title: 'Standard',
     turnaround: '4–10 business days',
-    price: '$5.00',
+    price: 1000,
   },
-  { id: 2, title: 'Express', turnaround: '2–5 business days', price: '$16.00' },
+  { id: 2, title: 'Express', turnaround: '2–5 business days', price: 2000 },
 ];
 
 function classNames(...classes) {
@@ -25,16 +31,19 @@ function classNames(...classes) {
 }
 
 export const Checkout = () => {
+  const [checkoutToken, setCheckoutToken] = useState(null);
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(
     deliveryMethods[0]
   );
   const [checkoutValue, setCheckoutValue] = useState({});
   const [countries, setCountries] = useState({});
+  let navigate = useNavigate();
 
   const value = useContext(DataContext);
   const [cart] = value.cart;
 
   console.log(checkoutValue);
+  console.log(cart);
 
   const renderCart = () => {
     if (!cart.line_items)
@@ -58,18 +67,70 @@ export const Checkout = () => {
     }
   };
 
+  const generateToken = async () => {
+    try {
+      const token = await commerce.checkout.generateTokenFrom('cart', cart.id);
+      setCheckoutToken(token);
+    } catch (err) {
+      console.error(err);
+      navigate('/', { replace: true });
+    }
+  };
+
   useEffect(() => {
     getCountries();
-  }, []);
+    generateToken();
+  }, [cart]);
+
+  console.log(checkoutToken);
+  const handleCheckout = async (event, elements, stripe) => {
+    if (!stripe || !elements) return;
+
+    const cardElement = elements.getElement(CardElement);
+
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardElement,
+    });
+    if (error) {
+      console.log('[error]', error);
+    } else {
+      const orderData = {
+        line_items: checkoutToken.live.line_items,
+        customer: {
+          firstName: checkoutValue.firstName,
+          lastName: checkoutValue.lastName,
+          email: checkoutValue.email,
+          phone: checkoutValue.phone,
+          shipping: {
+            name: 'Domestic',
+            street: checkoutValue.address,
+            town_city: checkoutValue.city,
+            country_state: checkoutValue.state,
+          },
+        },
+      };
+    }
+  };
 
   const renderCountries = () => {
     if (!countries.data) return <option value='Nigeria'>Nigeria</option>;
-    return countries.data.map(country => (
-      <option value={country.name.common}>{country.name.common}</option>
+    return countries.data.map((country, idx) => (
+      <option value={country.name.common} key={idx}>
+        {country.name.common}
+      </option>
     ));
   };
 
-  console.log(countries.data);
+  const renderSubTotal = () => {
+    if (!cart.subtotal) return null;
+    return cart.subtotal.raw;
+  };
+
+  let shipping = selectedDeliveryMethod.price;
+  let subtotal = renderSubTotal();
+  let tax = (shipping + subtotal) * 0.01;
+  let total = shipping + subtotal + tax;
 
   return (
     <div className='bg-white'>
@@ -270,6 +331,7 @@ export const Checkout = () => {
                         }
                         className='block w-full border-gray-300 bg-gray-50 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3'
                       >
+                        <option value='Nigeria'>Nigeria</option>
                         {renderCountries()}
                       </select>
                     </div>
@@ -340,7 +402,7 @@ export const Checkout = () => {
                         className={({ checked, active }) =>
                           classNames(
                             checked ? 'border-transparent' : 'border-gray-300',
-                            active ? 'ring-2 ring-indigo-500' : '',
+                            active ? 'ring-2 ring-gray-500' : '',
                             'relative bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none'
                           )
                         }
@@ -365,13 +427,13 @@ export const Checkout = () => {
                                   as='span'
                                   className='mt-6 text-sm font-medium text-gray-900'
                                 >
-                                  {deliveryMethod.price}
+                                  ₦{deliveryMethod.price}
                                 </RadioGroup.Description>
                               </div>
                             </div>
                             {checked ? (
                               <CheckCircleIcon
-                                className='h-5 w-5 text-indigo-600'
+                                className='h-5 w-5 text-green-600'
                                 aria-hidden='true'
                               />
                             ) : null}
@@ -379,7 +441,7 @@ export const Checkout = () => {
                               className={classNames(
                                 active ? 'border' : 'border-2',
                                 checked
-                                  ? 'border-indigo-500'
+                                  ? 'border-gray-500'
                                   : 'border-transparent',
                                 'absolute -inset-px rounded-lg pointer-events-none'
                               )}
@@ -409,32 +471,34 @@ export const Checkout = () => {
                   <div className='flex items-center justify-between'>
                     <dt className='text-sm'>Subtotal</dt>
                     <dd className='text-sm font-medium text-gray-900'>
-                      $64.00
+                      ₦{subtotal}
                     </dd>
                   </div>
                   <div className='flex items-center justify-between'>
                     <dt className='text-sm'>Shipping</dt>
-                    <dd className='text-sm font-medium text-gray-900'>$5.00</dd>
+                    <dd className='text-sm font-medium text-gray-900'></dd>₦
+                    {shipping}
                   </div>
                   <div className='flex items-center justify-between'>
-                    <dt className='text-sm'>Taxes</dt>
-                    <dd className='text-sm font-medium text-gray-900'>$5.52</dd>
+                    <dt className='text-sm'>V.A.T</dt>
+                    <dd className='text-sm font-medium text-gray-900'>
+                      ₦{tax}
+                    </dd>
                   </div>
                   <div className='flex items-center justify-between border-t border-gray-200 pt-6'>
                     <dt className='text-base font-medium'>Total</dt>
                     <dd className='text-base font-medium text-gray-900'>
-                      $75.52
+                      ₦{total}
                     </dd>
                   </div>
                 </dl>
 
                 <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
                   <button
-                    to='/order-summary/1'
                     type='submit'
                     className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
                   >
-                    Pay with Stripe
+                    Pay with Stripe (₦{total})
                   </button>
                 </div>
               </div>

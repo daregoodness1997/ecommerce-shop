@@ -6,6 +6,7 @@ export const DataContext = createContext();
 export const DataProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({});
+  const [order, setOrder] = useState({});
 
   const fetchProducts = async () => {
     const { data } = await commerce.products.list();
@@ -81,6 +82,7 @@ export const DataProvider = ({ children }) => {
     emptyCart: emptyCart,
     refreshCart: refreshCart,
     handleCheckout: handleCheckout,
+    order: [order, setOrder],
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
