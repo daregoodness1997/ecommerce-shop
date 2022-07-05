@@ -25,3 +25,5 @@ export default {
     }
   },
 };
+
+// https://www.querythreads.com/vite-js-react-build-not-redirecting-on-netlify-and-vercel/
