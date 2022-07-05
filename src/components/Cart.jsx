@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../Context';
+import ProgressiveImage from './ProgressiveImage';
 
 const Cart = ({ item }) => {
   const value = useContext(DataContext);
@@ -21,7 +22,7 @@ const Cart = ({ item }) => {
   return (
     <li className='flex py-6'>
       <div className='h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200'>
-        <img
+        <ProgressiveImage
           src={item.image.url}
           alt={item.product_name}
           className='h-full w-full object-cover object-center'
