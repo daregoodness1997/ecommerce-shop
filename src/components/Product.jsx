@@ -12,7 +12,7 @@ export const Product = ({ product, handleAddToCart }) => {
   const addCart = value.addCart;
   const [loading, setLoading] = useState(false);
   const [cart] = value.cart;
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const notify = () => toast('Wow so easy!');
 
@@ -21,16 +21,19 @@ export const Product = ({ product, handleAddToCart }) => {
   const addToCart = () => {
     setLoading(true);
     addCart(product.id, 1);
+    setOpen(true);
 
     setTimeout(() => {
       setLoading(false);
-      toast.success(`${product.name} added to cart`);
+      setOpen(false);
+
+      // toast.success(`${product.name} added to cart`);
     }, 1500);
   };
 
   return (
     <div>
-      <Toast type={'success'} />
+      <Alert open={open} />
 
       <div className='group relative'>
         <div className='w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>

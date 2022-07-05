@@ -83,6 +83,8 @@ export const Checkout = () => {
   }, [cart]);
 
   console.log(checkoutToken);
+
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
   const handleCheckout = async (event, elements, stripe) => {
     if (!stripe || !elements) return;
 
@@ -102,11 +104,20 @@ export const Checkout = () => {
           lastName: checkoutValue.lastName,
           email: checkoutValue.email,
           phone: checkoutValue.phone,
-          shipping: {
-            name: 'Domestic',
-            street: checkoutValue.address,
-            town_city: checkoutValue.city,
-            country_state: checkoutValue.state,
+        },
+        shipping: {
+          name: 'Domestic',
+          street: checkoutValue.address,
+          town_city: checkoutValue.city,
+          country_state: checkoutValue.state,
+          postal_zip_code: checkoutValue.postal,
+          country: checkoutValue.country,
+        },
+        fulfillment: { shipping_method: selectedDeliveryMethod.title },
+        payment: {
+          gateway: 'stripe',
+          stripe: {
+            payment_method_id: paymentMethod.id,
           },
         },
       };
