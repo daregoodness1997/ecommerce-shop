@@ -26,7 +26,7 @@ function App() {
           <Route path='/' element={<Products />} />
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/products/:id' element={<ProductDetails />} />
-          <Route path='/order-summary/:id' element={<OrderSummary />} />
+          <Route path='/order-summary' element={<OrderSummary />} />
           <Route path='*' element={<Page404 />} />
         </Routes>
       </div>

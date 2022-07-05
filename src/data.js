@@ -190,3 +190,113 @@ export const navigation = {
     { name: 'Stores', href: '#' },
   ],
 };
+
+export const checkoutForm = [
+  {
+    group: 'Contact Information',
+    forms: [
+      {
+        id: 1,
+        name: 'Email address',
+        type: 'email',
+        placeholder: 'Enter your email',
+        grid: 1,
+        comp: 'input',
+      },
+      {
+        id: 2,
+        name: 'Phone Number',
+        type: 'tel',
+        placeholder: 'Enter your phone number',
+        grid: 2,
+        comp: 'input',
+      },
+    ],
+  },
+  {
+    group: 'Shipping Information',
+    forms: [
+      {
+        id: 1,
+        name: 'First Name',
+        type: 'text',
+        placeholder: 'Enter your first name',
+        grid: 2,
+        comp: 'input',
+      },
+      {
+        id: 2,
+        name: 'Last Name',
+        type: 'text',
+        placeholder: 'Enter your last name',
+        grid: 2,
+        comp: 'input',
+      },
+      {
+        id: 3,
+        name: 'Address',
+        type: 'text',
+        placeholder: 'Enter your address',
+        grid: 1,
+        comp: 'input',
+      },
+      {
+        id: 4,
+        name: 'Apartment, suite, etc.',
+        type: 'text',
+        placeholder: 'Enter your apartment, suite, etc',
+        grid: 1,
+        comp: 'input',
+      },
+      {
+        id: 5,
+        name: 'City',
+        type: 'text',
+        placeholder: 'Enter your city',
+        grid: 2,
+        comp: 'input',
+      },
+      {
+        id: 6,
+        name: 'Country',
+        type: 'select',
+        placeholder: 'Enter your country',
+        grid: 2,
+        comp: 'select',
+      },
+      {
+        id: 7,
+        name: 'State/Province',
+        type: 'text',
+        placeholder: 'Enter your state/province',
+        grid: 2,
+        comp: 'input',
+      },
+      {
+        id: 8,
+        sname: 'Postal code',
+        type: 'text',
+        placeholder: 'Enter your postal code',
+        grid: 2,
+        comp: 'input',
+      },
+    ],
+  },
+  {
+    group: 'Delivery method',
+    forms: [
+      {
+        id: 1,
+        title: 'Standard',
+        turnaround: '4–10 business days',
+        price: '₦1000.00',
+      },
+      {
+        id: 2,
+        title: 'Express',
+        turnaround: '2–5 business days',
+        price: '₦2000.00',
+      },
+    ],
+  },
+];
