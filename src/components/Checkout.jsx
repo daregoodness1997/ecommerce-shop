@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { RadioGroup } from '@headlessui/react';
 
 import { CheckCircleIcon, TrashIcon } from '@heroicons/react/solid';
@@ -7,21 +7,9 @@ import Select from './Select';
 import { DataContext } from '../Context';
 import { Link } from 'react-router-dom';
 import Cart from './Cart';
+import { Audio } from 'react-loader-spinner';
+import api from '../utils/api';
 
-const products = [
-  {
-    id: 1,
-    title: 'Basic Tee',
-    href: '#',
-    price: '$32.00',
-    color: 'Black',
-    size: 'Large',
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/checkout-page-02-product-01.jpg',
-    imageAlt: "Front of men's Basic Tee in black.",
-  },
-  // More products...
-];
 const deliveryMethods = [
   {
     id: 1,
@@ -30,11 +18,6 @@ const deliveryMethods = [
     price: '$5.00',
   },
   { id: 2, title: 'Express', turnaround: '2–5 business days', price: '$16.00' },
-];
-const paymentMethods = [
-  { id: 'credit-card', title: 'Credit card' },
-  { id: 'paypal', title: 'PayPal' },
-  { id: 'etransfer', title: 'eTransfer' },
 ];
 
 function classNames(...classes) {
@@ -46,7 +29,7 @@ export const Checkout = () => {
     deliveryMethods[0]
   );
   const [checkoutValue, setCheckoutValue] = useState({});
-  const [countries, setCountries] = useState([]);
+  const [countries, setCountries] = useState({});
 
   const value = useContext(DataContext);
   const [cart] = value.cart;
@@ -54,12 +37,39 @@ export const Checkout = () => {
   console.log(checkoutValue);
 
   const renderCart = () => {
-    if (!cart.line_items) return '...loading';
+    if (!cart.line_items)
+      return (
+        <div className='w-full h-32 bg-white grid place-items-center'>
+          <Audio height='40' width='40' color='#000' ariaLabel='loading' />
+        </div>
+      );
 
     return cart.line_items.map(lineItem => (
       <Cart item={lineItem} key={lineItem.id} />
     ));
   };
+
+  const getCountries = async () => {
+    try {
+      const result = await api.handleCountries();
+      setCountries(result);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getCountries();
+  }, []);
+
+  const renderCountries = () => {
+    if (!countries.data) return <option value='Nigeria'>Nigeria</option>;
+    return countries.data.map(country => (
+      <option value={country.name.common}>{country.name.common}</option>
+    ));
+  };
+
+  console.log(countries.data);
 
   return (
     <div className='bg-white'>
@@ -248,12 +258,20 @@ export const Checkout = () => {
                       Country
                     </label>
                     <div className='mt-1'>
-                      <Select
+                      <select
                         id='country'
                         name='country'
-                        autoComplete='country-name'
-                        className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3'
-                      />
+                        autoComplete='country'
+                        onChange={e =>
+                          setCheckoutValue({
+                            ...checkoutValue,
+                            [e.target.name]: e.target.value,
+                          })
+                        }
+                        className='block w-full border-gray-300 bg-gray-50 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3'
+                      >
+                        {renderCountries()}
+                      </select>
                     </div>
                   </div>
 
