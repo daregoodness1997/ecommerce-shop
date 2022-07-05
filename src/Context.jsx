@@ -52,11 +52,25 @@ export const DataProvider = ({ children }) => {
     setCart(response);
   };
 
+  const handleCheckout = async (checkoutTokenId, newOrder) => {
+    try {
+      const incomingOrder = await commerce.checkout.capture(
+        checkoutTokenId,
+        newOrder
+      );
+
+      setOrder(incomingOrder);
+
+      refreshCart();
+    } catch (error) {
+      setErrorMessage(error.data.error.message);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
     fetchCart();
   }, []);
-
 
   const value = {
     products: [products, setProducts],
@@ -66,6 +80,7 @@ export const DataProvider = ({ children }) => {
     removeFromCart: removeFromCart,
     emptyCart: emptyCart,
     refreshCart: refreshCart,
+    handleCheckout: handleCheckout,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
