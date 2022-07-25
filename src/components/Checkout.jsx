@@ -43,7 +43,7 @@ export const Checkout = () => {
   const handleCheckout = value.handleCheckout;
   const emptyCart = value.emptyCart;
   const order = {
-    line_items: checkoutToken.live.line_items,
+    // line_items: checkoutToken.live.line_items,
     customer: {
       firstname: checkoutValue.firstName,
       lastname: checkoutValue.lastName,
