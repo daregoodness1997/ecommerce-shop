@@ -42,21 +42,22 @@ export const Checkout = () => {
   const [cart] = value.cart;
   const handleCheckout = value.handleCheckout;
   const emptyCart = value.emptyCart;
-  const order = {
-    // line_items: checkoutToken.live.line_items,
-    customer: {
-      firstname: checkoutValue.firstName,
-      lastname: checkoutValue.lastName,
-      email: checkoutValue.email,
-    },
-    shipping: { name: 'Domestic', street: checkoutValue.address },
-    fulfillment: { shipping_method: selectedDeliveryMethod },
-    deliveryMethod: selectedDeliveryMethod,
-    // orderId: checkoutToken.id,
-    checkoutDetails: checkoutValue,
+
+  const generateToken = async () => {
+    try {
+      const token = await commerce.checkout.generateTokenFrom('cart', cart.id);
+      setCheckoutToken(token);
+    } catch (err) {
+      console.error(err);
+      navigate('/', { replace: true });
+    }
   };
 
-  console.log(checkoutValue);
+  useEffect(() => {
+    getCountries();
+    generateToken();
+  }, [cart]);
+
   // console.log(cart);
 
   const renderCart = () => {
@@ -83,21 +84,6 @@ export const Checkout = () => {
 
   console.log('Cart ID', cart.id);
 
-  const generateToken = async () => {
-    try {
-      const token = await commerce.checkout.generateTokenFrom('cart', cart.id);
-      setCheckoutToken(token);
-    } catch (err) {
-      console.error(err);
-      navigate('/', { replace: true });
-    }
-  };
-
-  useEffect(() => {
-    getCountries();
-    generateToken();
-  }, [cart]);
-
   console.log('Checkout Token', checkoutToken);
   const renderSubTotal = () => {
     if (!cart.subtotal) return null;
@@ -118,6 +104,22 @@ export const Checkout = () => {
   };
 
   const onSuccess = reference => {
+    const order = {
+      line_items: checkoutToken.live.line_items || 0,
+      customer: {
+        firstname: checkoutValue.firstName,
+        lastname: checkoutValue.lastName,
+        email: checkoutValue.email,
+      },
+      shipping: { name: 'Domestic', street: checkoutValue.address },
+      fulfillment: { shipping_method: selectedDeliveryMethod },
+      deliveryMethod: selectedDeliveryMethod,
+      payment: { gateway: 'paystack' },
+      // orderId: checkoutToken.id,
+      checkoutDetails: checkoutValue,
+    };
+
+    console.log(checkoutValue);
     // Implementation for whatever you want to do with reference and after success call.
     console.log(reference, order);
     handleCheckout(checkoutToken.id, order);
