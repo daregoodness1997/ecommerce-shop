@@ -81,7 +81,7 @@ export const Product = ({ product, handleAddToCart }) => {
       </div>
       <div>
         <a
-          href={`https://wa.me/2347019805776/?text=Hello can I get this product https://prismatic-medovik-afb31b.netlify.app/products/${product.id}`}
+          href={`https://wa.me/2347019805776/?text=Hello can I get this product https://ecommerce-shop-navy.vercel.app//products/${product.id}`}
           target='_blank'
           className='flex  bg-green-400 text-white px-6 py-2 items-center justify-center rounded-md w-full mt-2 mb-1 text-center'
           onClick={() => console.log('added to cart')}
