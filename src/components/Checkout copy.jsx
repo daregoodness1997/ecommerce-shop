@@ -9,9 +9,6 @@ import { commerce } from '../utils/commerce';
 import { CheckoutForm } from './CheckoutForm';
 import { RadioGroup } from '@headlessui/react';
 import Input from './Input';
-import { usePaystackPayment } from 'react-paystack';
-
-// CheckCircleIcon
 
 const deliveryMethods = [
   {
@@ -30,7 +27,7 @@ function classNames(...classes) {
 import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
 export const Checkout = () => {
-  const [checkoutToken, setCheckoutToken] = useState('');
+  const [checkoutToken, setCheckoutToken] = useState(null);
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(
     deliveryMethods[0]
   );
@@ -41,22 +38,8 @@ export const Checkout = () => {
   const value = useContext(DataContext);
   const [cart] = value.cart;
   const handleCheckout = value.handleCheckout;
-  const emptyCart = value.emptyCart;
-  const order = {
-    line_items: checkoutToken.live.line_items,
-    customer: {
-      firstname: checkoutValue.firstName,
-      lastname: checkoutValue.lastName,
-      email: checkoutValue.email,
-    },
-    shipping: { name: 'Domestic', street: checkoutValue.address },
-    fulfillment: { shipping_method: selectedDeliveryMethod },
-    deliveryMethod: selectedDeliveryMethod,
-    // orderId: checkoutToken.id,
-    checkoutDetails: checkoutValue,
-  };
 
-  console.log(checkoutValue);
+  // console.log(checkoutValue);
   // console.log(cart);
 
   const renderCart = () => {
@@ -99,38 +82,6 @@ export const Checkout = () => {
   }, [cart]);
 
   console.log('Checkout Token', checkoutToken);
-  const renderSubTotal = () => {
-    if (!cart.subtotal) return null;
-    return cart.subtotal.raw;
-  };
-
-  let shipping = selectedDeliveryMethod.price;
-  let subtotal = renderSubTotal();
-  let tax = (shipping + subtotal) * 0.01;
-  let total = shipping + subtotal + tax;
-
-  const config = {
-    reference: checkoutToken.id || new Date().getTime().toString(),
-    email: checkoutValue.email,
-    amount: total * 100,
-    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-    body: JSON.stringify('User Data'),
-  };
-
-  const onSuccess = reference => {
-    // Implementation for whatever you want to do with reference and after success call.
-    console.log(reference, order);
-    handleCheckout(checkoutToken.id, order);
-    emptyCart();
-    navigate('/order-summary', { replace: true });
-  };
-
-  const onClose = () => {
-    // implementation for  whatever you want to do when the Paystack dialog closed.
-    console.log('closed');
-  };
-
-  const initializePayment = usePaystackPayment(config);
 
   const renderCountries = () => {
     if (!countries.data) return <option value='Nigeria'>Nigeria</option>;
@@ -141,16 +92,29 @@ export const Checkout = () => {
     ));
   };
 
+  const renderSubTotal = () => {
+    if (!cart.subtotal) return null;
+    return cart.subtotal.raw;
+  };
+
   const options = {
     clientSecret: import.meta.env.VITE_STRIPE_CLIENT_SECRET,
   };
+
+  let shipping = selectedDeliveryMethod.price;
+  let subtotal = renderSubTotal();
+  let tax = (shipping + subtotal) * 0.01;
+  let total = shipping + subtotal + tax;
 
   return (
     <div className='bg-white'>
       <main className='max-w-7xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:px-8'>
         <div className='max-w-2xl mx-auto lg:max-w-none'>
           <h1 className='sr-only'>Checkout</h1>
-          <div className='lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16'>
+          <form
+            onSubmit={e => handleSubmit(e, elements, stripe)}
+            className='lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16'
+          >
             <div>
               <div>
                 <h2 className='text-lg font-medium text-gray-900'>
@@ -170,7 +134,6 @@ export const Checkout = () => {
                       id='email-address'
                       name='email'
                       autoComplete='email'
-                      required={true}
                       onChange={e =>
                         setCheckoutValue({
                           ...checkoutValue,
@@ -445,7 +408,7 @@ export const Checkout = () => {
                               </div>
                             </div>
                             {checked ? (
-                              <div
+                              <CheckCircleIcon
                                 className='h-5 w-5 text-green-600'
                                 aria-hidden='true'
                               />
@@ -510,20 +473,15 @@ export const Checkout = () => {
                     </dd>
                   </div>
                 </dl>
-                {/* Paying with PayStack */}
+                {/* Paying with Stripe */}
                 <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
-                  <button
-                    className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
-                    onClick={() => {
-                      initializePayment(onSuccess, onClose);
-                    }}
-                  >
-                    Pay with PayStack (₦{total})
+                  <button className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'>
+                    Pay with Stripe (₦{total})
                   </button>
                 </div>
               </div>
             </div>
-          </div>{' '}
+          </form>{' '}
         </div>
       </main>
     </div>

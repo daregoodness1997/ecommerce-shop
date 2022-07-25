@@ -20,7 +20,7 @@ export const Products = () => {
     setSearchParams(params);
   };
 
-  console.log(queryParams, searchParams.get('byCity'));
+  // console.log(queryParams, searchParams.get('byCity'));
 
   if (!products.length) return <Loader />;
 
