@@ -7,6 +7,7 @@ export const DataProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({});
   const [order, setOrder] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
 
   const fetchProducts = async () => {
     const { data } = await commerce.products.list();

@@ -10,6 +10,14 @@ import { CheckoutForm } from './CheckoutForm';
 import { RadioGroup } from '@headlessui/react';
 import Input from './Input';
 import { usePaystackPayment } from 'react-paystack';
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  CardElement,
+  Elements,
+  ElementsConsumer,
+  useElements,
+  useStripe,
+} from '@stripe/react-stripe-js';
 
 // CheckCircleIcon
 
@@ -27,7 +35,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+console.log('stripe promise', stripePromise);
 
 export const Checkout = () => {
   const [checkoutToken, setCheckoutToken] = useState('');
@@ -36,6 +46,7 @@ export const Checkout = () => {
   );
   const [checkoutValue, setCheckoutValue] = useState({});
   const [countries, setCountries] = useState({});
+  const [showStripe, setShowStripe] = useState(false);
   let navigate = useNavigate();
 
   const value = useContext(DataContext);
@@ -96,35 +107,47 @@ export const Checkout = () => {
   let total = shipping + subtotal + tax;
 
   const config = {
-    reference: checkoutToken.id || new Date().getTime().toString(),
+    reference: new Date().getTime().toString(),
     email: checkoutValue.email,
     amount: total * 100,
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-    body: JSON.stringify('User Data'),
+    body: checkoutValue,
   };
 
   const onSuccess = reference => {
-    const order = {
+    let order = {
       line_items: checkoutToken.live.line_items || 0,
       customer: {
         firstname: checkoutValue.firstName,
         lastname: checkoutValue.lastName,
         email: checkoutValue.email,
       },
-      shipping: { name: 'Domestic', street: checkoutValue.address },
-      fulfillment: { shipping_method: selectedDeliveryMethod },
+      shipping: {
+        name: 'Domestic',
+        street: checkoutValue.address,
+        town_city: checkoutValue.city,
+        country: 'US', // || checkoutValue.country,
+      },
+      fulfillment: { shipping_method: selectedDeliveryMethod.title },
       deliveryMethod: selectedDeliveryMethod,
-      payment: { gateway: 'paystack' },
+
+      //https://commercejs.com/docs/guides/paystack-integration#payment-flow
+
+      payment: {
+        gateway: 'paystack',
+        paystack: {
+          reference: new Date().getTime().toString(),
+        },
+      },
       // orderId: checkoutToken.id,
       checkoutDetails: checkoutValue,
     };
 
-    console.log(checkoutValue);
+    console.log('token', checkoutToken);
     // Implementation for whatever you want to do with reference and after success call.
     console.log(reference, order);
+
     handleCheckout(checkoutToken.id, order);
-    emptyCart();
-    navigate('/order-summary', { replace: true });
   };
 
   const onClose = () => {
@@ -133,6 +156,8 @@ export const Checkout = () => {
   };
 
   const initializePayment = usePaystackPayment(config);
+
+  console.log('Checkout Values', checkoutValue);
 
   const renderCountries = () => {
     if (!countries.data) return <option value='Nigeria'>Nigeria</option>;
@@ -143,10 +168,86 @@ export const Checkout = () => {
     ));
   };
 
-  const options = {
-    clientSecret: import.meta.env.VITE_STRIPE_CLIENT_SECRET,
+  const handlePayment = async (e, elements, stripe) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: elements.getElement(CardElement),
+    });
+    if (error) {
+      console.log('[error]', error);
+    } else {
+      const order = {
+        line_items: checkoutToken.live.line_items || 0,
+        customer: {
+          firstname: checkoutValue.firstName,
+          lastname: checkoutValue.lastName,
+          email: checkoutValue.email,
+        },
+        shipping: {
+          name: 'Domestic',
+          street: checkoutValue.address,
+          town_city: checkoutValue.city,
+          country: 'US', // || checkoutValue.country,
+        },
+        fulfillment: { shipping_method: selectedDeliveryMethod.title },
+        deliveryMethod: selectedDeliveryMethod,
+
+        //https://commercejs.com/docs/guides/paystack-integration#payment-flow
+
+        payment: {
+          gateway: 'stripe',
+          stripe: {
+            payment_method_id: paymentMethod.id,
+          },
+        },
+      };
+
+      handleCheckout(checkoutToken.id, order);
+      navigate('/order-summary');
+    }
   };
 
+  const testPaymentMethod = () => {
+    let order = {
+      line_items: checkoutToken.live.line_items || 0,
+      customer: {
+        firstname: checkoutValue.firstName,
+        lastname: checkoutValue.lastName,
+        email: checkoutValue.email,
+      },
+      shipping: {
+        name: 'Domestic',
+        street: checkoutValue.address,
+        town_city: checkoutValue.city,
+        country: 'US', // || checkoutValue.country,
+      },
+      fulfillment: { shipping_method: selectedDeliveryMethod.title },
+      deliveryMethod: selectedDeliveryMethod,
+
+      //https://commercejs.com/docs/guides/paystack-integration#payment-flow
+
+      payment: {
+        gateway: 'test_gateway',
+        card: {
+          number: '4242424242424242',
+          expiry_month: '02',
+          expiry_year: '24',
+          cvc: '123',
+          postal_zip_code: '94107',
+        },
+      },
+      // orderId: checkoutToken.id,
+      checkoutDetails: checkoutValue,
+    };
+
+    console.log('token', checkoutToken);
+    // Implementation for whatever you want to do with reference and after success call.
+
+    handleCheckout(checkoutToken.id, order);
+    navigate('/order-summary');
+  };
   return (
     <div className='bg-white'>
       <main className='max-w-7xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:px-8'>
@@ -225,6 +326,7 @@ export const Checkout = () => {
                         id='first-name'
                         name='firstName'
                         autoComplete='given-name'
+                        required={true}
                         onChange={e =>
                           setCheckoutValue({
                             ...checkoutValue,
@@ -248,6 +350,7 @@ export const Checkout = () => {
                         id='last-name'
                         name='lastName'
                         autoComplete='family-name'
+                        required={true}
                         onChange={e =>
                           setCheckoutValue({
                             ...checkoutValue,
@@ -271,6 +374,7 @@ export const Checkout = () => {
                         name='address'
                         id='address'
                         autoComplete='street-address'
+                        required={true}
                         onChange={e =>
                           setCheckoutValue({
                             ...checkoutValue,
@@ -316,6 +420,7 @@ export const Checkout = () => {
                         name='city'
                         id='city'
                         autoComplete='address-level2'
+                        required={true}
                         onChange={e =>
                           setCheckoutValue({
                             ...checkoutValue,
@@ -338,6 +443,8 @@ export const Checkout = () => {
                         id='country'
                         name='country'
                         autoComplete='country'
+                        required={true}
+                        defaultValue={'Nigeria'}
                         onChange={e =>
                           setCheckoutValue({
                             ...checkoutValue,
@@ -346,7 +453,7 @@ export const Checkout = () => {
                         }
                         className='block w-full border-gray-300 bg-gray-50 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3'
                       >
-                        <option value='Nigeria'>Nigeria</option>
+                        {/* <option value='Nigeria'>Nigeria</option> */}
                         {renderCountries()}
                       </select>
                     </div>
@@ -512,15 +619,61 @@ export const Checkout = () => {
                     </dd>
                   </div>
                 </dl>
+
                 {/* Paying with PayStack */}
                 <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
+                  {/*  */}
+                  {showStripe ? (
+                    <Elements stripe={stripePromise}>
+                      <ElementsConsumer>
+                        {({ elements, stripe }) => (
+                          <form
+                            onSubmit={e => handlePayment(e, elements, stripe)}
+                          >
+                            <CardElement
+                              options={{
+                                style: {
+                                  base: {
+                                    fontSize: '16px',
+                                    color: '#424770',
+                                    '::placeholder': {
+                                      color: '#aab7c4',
+                                    },
+                                  },
+                                  invalid: {
+                                    color: '#9e2146',
+                                  },
+                                },
+                              }}
+                            />
+                            <br /> <br />
+                            <button
+                              type='submit'
+                              disabled={!stripe}
+                              className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
+                            >
+                              Pay {total}
+                            </button>
+                          </form>
+                        )}
+                      </ElementsConsumer>
+                    </Elements>
+                  ) : (
+                    <button
+                      onClick={() => setShowStripe(true)}
+                      className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
+                    >
+                      Pay with Stripe (₦{total})
+                    </button>
+                  )}
+                </div>
+
+                <div className='border-t border-gray-200 py-6 px-4 sm:px-6'>
                   <button
+                    onClick={testPaymentMethod}
                     className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
-                    onClick={() => {
-                      initializePayment(onSuccess, onClose);
-                    }}
                   >
-                    Pay with PayStack (₦{total})
+                    Test Payment
                   </button>
                 </div>
               </div>
@@ -529,5 +682,27 @@ export const Checkout = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+const StripePay = ({ total, handlePayment }) => {
+  return (
+    <Elements stripe={stripePromise}>
+      <ElementsConsumer>
+        {({ elements, stripe }) => (
+          <form onSubmit={e => handlePayment(e, elements, stripe)}>
+            <CardElement />
+            <br /> <br />
+            <button
+              type='submit'
+              disabled={!stripe}
+              className='w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500'
+            >
+              Pay {total}
+            </button>
+          </form>
+        )}
+      </ElementsConsumer>
+    </Elements>
   );
 };
